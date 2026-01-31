@@ -1,0 +1,4 @@
+course_id:int:pk
+course_name:string
+instructor:string
+credits:int

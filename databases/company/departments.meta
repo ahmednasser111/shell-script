@@ -1,0 +1,3 @@
+dept_id:string:pk
+dept_name:string
+budget:int

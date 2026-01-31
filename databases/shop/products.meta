@@ -1,0 +1,4 @@
+product_id:int:pk
+name:string
+price:int
+stock:int

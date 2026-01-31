@@ -1,0 +1,4 @@
+emp_id:int
+name:string
+salary:int
+department:string:pk
