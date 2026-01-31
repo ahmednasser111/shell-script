@@ -103,3 +103,71 @@ press_any_key() {
     echo ""
     read -p "Press Enter to continue..."
 }
+
+# List items from directory and return selected item
+# Usage: select_from_list "$dir_path" "*.meta" "Item Type"
+select_from_list() {
+    local dir_path=$1
+    local exclude_pattern=$2
+    local item_type=$3
+    
+    if [[ ! -d "$dir_path" ]] || [[ -z "$(ls -A "$dir_path" 2>/dev/null)" ]]; then
+        return 1
+    fi
+    
+    local -a items
+    local count=0
+    for item in "$dir_path"/*; do
+        if [[ -f "$item" ]]; then
+            [[ "$exclude_pattern" != "" && "$item" == $exclude_pattern ]] && continue
+        fi
+        items+=("$(basename "$item")")
+    done
+    
+    if [[ ${#items[@]} -eq 0 ]]; then
+        return 1
+    fi
+    
+    echo "Available $item_type:"
+    echo "$(printf '%0.s-' {1..25})"
+    for ((i=0; i<${#items[@]}; i++)); do
+        echo "  $((i+1)). ${items[$i]}"
+    done
+    echo ""
+    
+    return 0
+}
+
+# Get table files from database directory (excludes .meta files)
+get_table_files() {
+    local db_path=$1
+    for file in "$db_path"/*; do
+        if [[ -f "$file" && ! "$file" == *.meta ]]; then
+            basename "$file"
+        fi
+    done
+}
+
+# Prompt for input with validation and retry
+prompt_validated() {
+    local prompt=$1
+    local validator=$2
+    local max_attempts=3
+    local attempt=0
+    
+    while [[ $attempt -lt $max_attempts ]]; do
+        read -p "$prompt" input
+        if $validator "$input"; then
+            echo "$input"
+            return 0
+        fi
+        ((attempt++))
+        if [[ $attempt -lt $max_attempts ]]; then
+            print_warning "Invalid input. Try again ($((max_attempts - attempt)) attempts left)."
+        fi
+    done
+    
+    print_error "Too many invalid attempts."
+    return 1
+}
+
