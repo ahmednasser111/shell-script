@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Source libraries
 source ./lib/config.sh
 source ./lib/utils.sh
 source ./lib/database.sh
